@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AquaSense - Complaints</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .hover-effect { transition: all 0.2s ease; }
+    .hover-effect:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+    .card-hover { transition: all 0.2s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-color: #3B82F6; }
+    .bottom-tab { text-center transition-all duration-200; }
+    .bottom-tab:hover { color: #2563EB; transform: scale(1.1); }
+    .complaint-item { transition: background-color 0.2s; }
+    .complaint-item:hover { background-color: #f0f9ff; cursor: pointer; }
+  </style>
+</head>
+<body class="h-full flex flex-col">
+
+  <header class="bg-white shadow-sm p-4">
+    <h1 class="text-xl font-bold text-blue-700">Complaints</h1>
+  </header>
+
+  <main class="flex-1 p-4 overflow-y-auto">
+    <div class="bg-white p-6 rounded-lg shadow mb-8 card-hover">
+      <h3 class="text-lg font-semibold mb-4">Raise a Complaint</h3>
+      <form id="complaintForm">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700">House Number</label>
+          <input type="text" value="H101" disabled
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100"/>
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700">Reason</label>
+          <select id="reason" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            <option value="">-- Select Reason --</option>
+            <option value="Poor Quality">Poor Quality</option>
+            <option value="Low Pressure">Low Pressure</option>
+            <option value="Leakage">Leakage</option>
+          </select>
+        </div>
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700">Description</label>
+          <textarea id="description" rows="3"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
+        </div>
+        <button type="submit"
+                class="bg-red-600 hover:bg-red-700 hover-effect text-white px-6 py-2 rounded-lg">
+          <i class="fas fa-paper-plane mr-2"></i> Submit Complaint
+        </button>
+      </form>
+    </div>
+
+    <div class="bg-yellow-50 border border-yellow-200 p-6 rounded-lg">
+      <h3 class="text-lg font-semibold text-yellow-800 mb-4">Auto Complaints</h3>
+      <ul id="autoComplaints" class="space-y-2 text-sm text-yellow-700">
+        <li class="complaint-item">🔴 High TDS detected at 10:30 AM</li>
+      </ul>
+    </div>
+  </main>
+
+  <nav class="bg-white border-t border-gray-200 px-4 py-2 flex justify-around">
+    <a href="dashboard.html" class="text-gray-500 text-center bottom-tab">
+      <i class="fas fa-tachometer-alt block text-xl"></i>
+      <span class="text-xs">Dashboard</span>
+    </a>
+    <a href="history.html" class="text-gray-500 text-center bottom-tab">
+      <i class="fas fa-chart-line block text-xl"></i>
+      <span class="text-xs">History</span>
+    </a>
+    <a href="complaints.html" class="text-blue-600 text-center bottom-tab">
+      <i class="fas fa-exclamation-triangle block text-xl"></i>
+      <span class="text-xs">Complaints</span>
+    </a>
+    <a href="settings.html" class="text-gray-500 text-center bottom-tab">
+      <i class="fas fa-cog block text-xl"></i>
+      <span class="text-xs">Settings</span>
+    </a>
+  </nav>
+
+  <div id="modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-80 text-center">
+      <i id="modalIcon" class="text-4xl mb-4"></i>
+      <p id="modalMessage" class="mb-4"></p>
+      <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover-effect">OK</button>
+    </div>
+  </div>
+
+  <script src="js/complaints.js"></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gradient-to-br from-blue-50 to-cyan-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AquaSense - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .hover-effect { transition: all 0.2s ease; }
+    .hover-effect:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+  </style>
+</head>
+
+<body class="h-full flex items-center justify-center">
+
+  <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg">
+    <div class="text-center">
+      <i class="fas fa-tint text-blue-500 text-5xl mb-4"></i>
+      <h2 class="text-2xl font-bold text-gray-800">Welcome to AquaSense</h2>
+      <p class="text-gray-500">Enter your house number to login</p>
+    </div>
+
+    <form id="loginForm">
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">House Number</label>
+        <input type="text" id="houseNumber" required
+               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+               placeholder="e.g. H101">
+      </div>
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" id="password" required
+               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <button type="submit"
+              class="w-full bg-blue-600 hover:bg-blue-700 hover-effect text-white font-bold py-2 px-4 rounded-lg transition">
+        Login
+      </button>
+    </form>
+
+    <div class="text-center">
+      <a href="forgot-password.html" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-80 text-center">
+      <i id="modalIcon" class="text-4xl mb-4"></i>
+      <p id="modalMessage" class="mb-4"></p>
+      <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover-effect">OK</button>
+    </div>
+  </div>
+
+  <!-- 🔥 FIREBASE INTEGRATION -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbzOatV0_nBlCndTI0OOFUh9a_12EdUfs",
+      authDomain: "aquasense-cloud-1.firebaseapp.com",
+      databaseURL: "https://aquasense-cloud-1-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "aquasense-cloud-1",
+      storageBucket: "aquasense-cloud-1.firebasestorage.app",
+      messagingSenderId: "27330603659",
+      appId: "1:27330603659:web:dc3e9439f82b3fff6dc28e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const form = document.getElementById("loginForm");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const houseNumber = document.getElementById("houseNumber").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      try {
+        const snapshot = await get(ref(db, "users/" + houseNumber));
+
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+
+          if (String(userData.password) === password) {
+            showModal("Login Successful!", "fa-check-circle text-green-500");
+            setTimeout(() => {
+              window.location.href = "dashboard.html";
+            }, 1500);
+          } else {
+            showModal("Incorrect password.", "fa-times-circle text-red-500");
+          }
+        } else {
+          showModal("House number not found.", "fa-times-circle text-red-500");
+        }
+      } catch (error) {
+        showModal("Error connecting to server.", "fa-times-circle text-red-500");
+        console.error(error);
+      }
+    });
+
+    function showModal(message, iconClass) {
+      document.getElementById("modalMessage").innerText = message;
+      const icon = document.getElementById("modalIcon");
+      icon.className = "text-4xl mb-4 " + iconClass;
+      document.getElementById("modal").classList.remove("hidden");
+    }
+
+    window.closeModal = function() {
+      document.getElementById("modal").classList.add("hidden");
+    };
+  </script>
+
+</body>
+</html>

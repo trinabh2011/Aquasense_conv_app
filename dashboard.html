@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AquaSense - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .hover-effect { transition: all 0.2s ease; }
+    .hover-effect:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+    .card-hover { transition: all 0.2s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-color: #3B82F6; }
+    .bottom-tab { text-center transition-all duration-200; }
+    .bottom-tab:hover { color: #2563EB; transform: scale(1.1); }
+    @keyframes wave { 0%,100% { transform: translateY(0); opacity: 0.6; } 50% { transform: translateY(-10px); opacity: 1; } }
+    .wave { height: 5px; background: linear-gradient(to bottom, transparent, #3B82F6 50%, transparent); border-radius: 50%; width: 80%; margin: 10px auto; animation: wave 1.5s infinite ease-in-out; }
+  </style>
+</head>
+<body class="h-full flex flex-col">
+
+  <header class="bg-white shadow-sm p-4">
+    <h1 class="text-xl font-bold text-blue-700">Dashboard</h1>
+  </header>
+
+  <main class="flex-1 p-4 overflow-y-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white p-4 rounded-lg shadow card-hover border text-center">
+        <h3 class="text-sm font-semibold text-gray-700">TDS (ppm)</h3>
+        <p id="tdsValue" class="text-2xl font-bold text-green-600">320</p>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow card-hover border text-center">
+        <h3 class="text-sm font-semibold text-gray-700">Flow Rate</h3>
+        <p id="flowRate" class="text-2xl font-bold text-blue-600">2.4 L/min</p>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow card-hover border text-center">
+        <h3 class="text-sm font-semibold text-gray-700">Total Water</h3>
+        <p id="totalWater" class="text-2xl font-bold text-purple-600">188 L</p> <!-- ✅ Unit Added -->
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow mb-6 text-center">
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">Water Tank Level</h3>
+      <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+        <div id="tankLevelBar" class="bg-blue-500 h-3 rounded-full" style="width: 75%;"></div>
+      </div>
+      <p class="text-sm text-gray-600"><span id="tankLevelText">75%</span> Full</p>
+    </div>
+
+    <div class="flex flex-col items-center my-8">
+      <button id="measureTankBtn"
+              class="hover-effect flex flex-col items-center gap-2 p-5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-full shadow-lg hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 transform hover:scale-105">
+        <i class="fas fa-vial text-xl"></i>
+        <span class="font-medium">Measure Tank TDS</span>
+        <i class="fas fa-tint fa-bounce text-blue-100"></i>
+      </button>
+      <button id="connectBluetoothBtn"
+              class="hover-effect flex flex-col items-center gap-2 p-5 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full shadow-lg hover:from-purple-700 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 mt-4">
+        <i class="fas fa-bluetooth-b text-xl"></i>
+        <span class="font-medium">Connect Bluetooth</span>
+        <i class="fas fa-bluetooth text-purple-100"></i>
+      </button>
+      <p class="text-xs text-gray-500 mt-3">Last: <span id="lastTDS">320 ppm</span> (<span id="lastUpdate">just now</span>)</p>
+      <p class="text-xs text-gray-500 mt-1">Bluetooth: <span id="bluetoothStatus" class="text-red-500">Disconnected</span></p>
+    </div>
+
+    <div id="tdsStatusCard" class="p-4 border rounded-lg bg-green-50 border-green-200 text-center">
+      <h3 class="text-md font-semibold text-green-800">Water Quality: Safe</h3>
+      <p class="text-sm text-green-600">Ideal for drinking</p>
+    </div>
+  </main>
+
+  <nav class="bg-white border-t border-gray-200 px-4 py-2 flex justify-around">
+    <a href="dashboard.html" class="text-blue-600 text-center bottom-tab">
+      <i class="fas fa-tachometer-alt block text-xl"></i>
+      <span class="text-xs">Dashboard</span>
+    </a>
+    <a href="history.html" class="text-gray-500 text-center bottom-tab">
+      <i class="fas fa-chart-line block text-xl"></i>
+      <span class="text-xs">History</span>
+    </a>
+    <a href="complaints.html" class="text-gray-500 text-center bottom-tab">
+      <i class="fas fa-exclamation-triangle block text-xl"></i>
+      <span class="text-xs">Complaints</span>
+    </a>
+    <a href="settings.html" class="text-gray-500 text-center bottom-tab">
+      <i class="fas fa-cog block text-xl"></i>
+      <span class="text-xs">Settings</span>
+    </a>
+  </nav>
+
+  <div id="alertBanner" class="hidden mx-4 my-3 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm">
+    <i class="fas fa-exclamation-triangle mr-1"></i>
+    Unsafe TDS detected! An auto-complaint has been filed.
+  </div>
+
+  <div id="modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-80 text-center">
+      <i id="modalIcon" class="text-4xl mb-4"></i>
+      <p id="modalMessage" class="mb-4"></p>
+      <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover-effect">OK</button>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
